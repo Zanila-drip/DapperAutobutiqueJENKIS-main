@@ -1,0 +1,56 @@
+name: CI/CD Deploy to DigitalOcean Kubernetes
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  REGISTRY: registry.digitalocean.com/dapperautobutique
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Login to DigitalOcean Container Registry
+      - name: Login to DigitalOcean Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ secrets.Zanila-drip }}
+          password: ${{ secrets.dop_v1_9d48a6b879a961a88391abb591c337a6ba5b43d27def45f2bfd6d1af93184aa9 }}
+
+      # Build and push backend image
+      - name: Build and push backend image
+        run: |
+          docker build -t $REGISTRY/backend:latest ./backend
+          docker push $REGISTRY/backend:latest
+
+      # Build and push frontend image
+      - name: Build and push frontend image
+        run: |
+          docker build -t $REGISTRY/frontend:latest ./frontend
+          docker push $REGISTRY/frontend:latest
+
+      # Instala kubectl
+      - name: Install kubectl
+        uses: azure/setup-kubectl@v3
+
+      # Configura el kubeconfig
+      - name: Set up KUBECONFIG
+        run: |
+          echo "${{ secrets.KUBECONFIG }}" > kubeconfig
+          export KUBECONFIG=$PWD/kubeconfig
+
+      # Aplica los manifiestos de Kubernetes
+      - name: Deploy to Kubernetes
+        env:
+          KUBECONFIG: ${{ github.workspace }}/kubeconfig
+        run: |
+          kubectl apply -f k8s-manifiestos/postgres-deployment.yaml
+          kubectl apply -f k8s-manifiestos/backend-deployment.yaml
+          kubectl apply -f k8s-manifiestos/frontend-deployment.yaml
