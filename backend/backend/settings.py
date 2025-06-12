@@ -46,7 +46,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://138.197.236.79:5173",
 ]
 CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOW_ALL_ORIGINS = False
+CORS_ALLOW_ALL_ORIGINS = True # <--- :D
 
 # Base de datos PostgreSQL
 DATABASES = {
