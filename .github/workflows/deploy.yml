@@ -3,7 +3,7 @@ name: CI/CD Deploy to DigitalOcean Kubernetes
 on:
   push:
     branches:
-      - main
+
 
 env:
   REGISTRY: registry.digitalocean.com/dapperautobutique
