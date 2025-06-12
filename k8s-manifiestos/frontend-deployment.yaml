@@ -19,6 +19,8 @@ spec:
         - containerPort: 80
         env:
           - name: VITE_API_URL
+            value: "http://165.227.242.36:8000"
+          - name: VITE_API_URL
             value: "http://138.197.236.30:8000"
       imagePullSecrets:
         - name: regcred
